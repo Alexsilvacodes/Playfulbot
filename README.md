@@ -12,4 +12,5 @@ Once you've installed pip, you can download playfulbot with this: `pip install p
 Running `playfulbot.py -h` gives you help with the program
 
 ##Version
-v1.0.3
+Command line: v1.0.4
+GUI: v1.0
