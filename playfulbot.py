@@ -57,12 +57,14 @@ def main():
 			try:
 				# Obtener numero de coins
 				coins = promo[0].b.string.split(" ")[0].replace(".", "")
+
+				bet_num = 0
 	
 				# Numero de apuestas
 				if int(coins_arg > 800) and tasa_min_arg:
 					bet_max = int(coins) // int(coins_arg)
 					bet_min = (int(coins) - bet_max * int(coins_arg)) // int(coins_min_arg)
-					bet_num = bet_num + bet_max
+					bet_num = bet_max + bet_min
 	
 					print
 					print cyan_ini + "Se realizarán", bet_max, "apuestas de " + str(coins_arg) + " coins y", bet_min,
