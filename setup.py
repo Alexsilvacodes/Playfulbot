@@ -12,7 +12,7 @@ from setuptools import setup#, find_packages
 setup(
 	name="Playfulbot",
 	description="Playfulbet auto-bet",
-	version="1.0.6",
+	version="1.0.16",
 	author="Alex Silva",
 	author_email="h4ll0ck at gmail dot com",
 	url="https://github.com/Alexsays/Playfulbot",
@@ -25,6 +25,7 @@ setup(
     },
 	install_requires=[
 		"mechanize",
-		"beautifulsoup4"
+		"beautifulsoup4",
+		"colorama"
 	]
 )

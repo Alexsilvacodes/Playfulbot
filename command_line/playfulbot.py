@@ -5,14 +5,15 @@
 
 import httplib, urllib, urllib2, mechanize, argparse
 from bs4 import BeautifulSoup
+from colorama import Fore
 
 def main():
-	red_ini = "\033[31m"
-	red_end = "\033[0m"
-	green_ini = "\033[32m"
-	green_end = "\033[0m"
-	cyan_ini = "\033[36m"
-	cyan_end = "\033[0m"
+	red_ini = "Fore.RED"
+	red_end = "Fore.RESET"
+	green_ini = "Fore.GREEN"
+	green_end = "Fore.RESET"
+	cyan_ini = "Fore.CYAN"
+	cyan_end = "Fore.RESET"
 
 	argument_parser = argparse.ArgumentParser(description="Autoapuestas en " +
 	"Playfulbet")
@@ -49,16 +50,22 @@ def main():
 		for key in form_data:
 			mbrowser.form[key] = form_data[key]
 		mainpage_loggedin = mbrowser.submit()
-
-		parser_mainpage = BeautifulSoup(mainpage_loggedin.read())
+		
+		parser_mainpage = BeautifulSoup(mbrowser.follow_link(url_regex="/usuarios"))
 		promo = parser_mainpage.findAll("a", {"href": "/promociones"})
 		connected = len(promo) > 1
 
 		if connected:
 			try:
 				# Obtener numero de coins
-				coins = parser_mainpage.findAll("b", {"class": "active-coins"})[0].string
-				played_coins = parser_mainpage.findAll("b", {"class": "played"})[0].string
+				coins = parser_mainpage.findAll("b", {"class": "active-coins"})
+				played_coins = parser_mainpage.findAll("b", {"class": "played"})
+
+				if len(coins) == 0 or len(played_coins) == 0:
+					raise Exception(red_ini + ">> Conexion con servidor cancelada" + red_end)
+
+				coins = coins[0].string
+				played_coins = played_coins[0].string 
 
 				print
 				print "Tienes:"
@@ -66,15 +73,17 @@ def main():
 				print red_ini + "- " + played_coins + " coins jugadas" + red_end
 				print
 				
+				coins = coins.replace(".", "")
+
 				key_response = raw_input("Desea continuar la apuesta [s/n]: ")
-				if key_response.lower() is "s" or key_response is "" or int(coins) < 200:
+				if key_response.lower() == "s" or key_response == "" or int(coins) < 200:
 					pass
 				else:
 					raise KeyboardInterrupt
 
-				coins = coins.replace(".", "")
-
 				bet_num = 0
+				bet_max = 0
+				bet_min = 0
 
 				# Numero de apuestas
 				if int(coins_arg > 800) and tasa_min_arg:
@@ -90,8 +99,9 @@ def main():
 				else:
 					bet_num = int(coins) // int(coins_arg)
 
+
 					print
-					print cyan_ini + "Se realizarán", bet_num, "apuestas de " + coins_arg + \
+					print cyan_ini + "Se realizarán", bet_num, "apuestas de " + str(coins_arg) + \
 					" coins" + cyan_end
 					print
 
@@ -104,15 +114,16 @@ def main():
 					# Bucle de eventos
 					link_url = ""
 					links = []
+					mbrowser.follow_link(url_regex="/eventos")
 					for link in mbrowser.links(text_regex="Juega"):
 						links.append(link)
+
 					i = 0
 					errors = 0
 					while i < len(links) and bet_num > 0:
 						link = links[i]
 						# Para que no se repitan obtener solo los eventos que no se han jugado
-						if link.attrs[1][1] == "btn--action" and link_url != link.url and \
-						link.text != "Juega otra vez":
+						if link.attrs[1][1] == "btn--action" and link_url != link.url and link.text != "Juega otra vez":
 							link_url = link.url
 							mbrowser.follow_link(link)
 							parser_eventpage = BeautifulSoup(mbrowser.response().read())
@@ -134,28 +145,35 @@ def main():
 								# Rellenar formulario de apuesta
 								mbrowser.select_form(nr=2)
 								mbrowser.form["option_id"] = [min_option.split("_")[-1]]
-								if int(coins_arg > 800) and min <= 1.2 and bet_min > 0 and tasa_min_arg:
+								if coins_arg > 800 and min <= 1.2 and bet_min > 0 and tasa_min_arg:
 									mbrowser.form["points"] = str(coins_min_arg)
 									bet_done = mbrowser.submit()
 									parser_eventpage = BeautifulSoup(bet_done.read())
 									advice = parser_eventpage.findAll("div", {"id": "flash"})
-									print "Tasa:", str(min), "-", str(advice[0]).split("\">")[1].split("</")[0]
+									print "Tasa:", str(min), ", apuesta:", coins_min_arg, "-", str(advice[0]).split("\">")[1].split("</")[0]
 									mbrowser.follow_link(text_regex="Jugar")
 									# Se disminuye el contador de apuestas
 									bet_min -= 1
 									bet_num -= 1
-								elif int(coins_arg > 800) and min > 1.2 and bet_max and tasa_min_arg:
+								elif coins_arg > 800 and min > 1.2 and bet_max > 0 and tasa_min_arg:
 									mbrowser.form["points"] = str(coins_arg)
 									bet_done = mbrowser.submit()
 									parser_eventpage = BeautifulSoup(bet_done.read())
 									advice = parser_eventpage.findAll("div", {"id": "flash"})
-									print "Tasa:", str(min), "-", str(advice[0]).split("\">")[1].split("</")[0]
+									print "Tasa:", str(min), ", apuesta:", coins_arg, "-", str(advice[0]).split("\">")[1].split("</")[0]
 									mbrowser.follow_link(text_regex="Jugar")
 									# Se disminuye el contador de apuestas
 									bet_max -= 1
 									bet_num -= 1
 								else:
-									pass
+									mbrowser.form["points"] = str(coins_arg)
+									bet_done = mbrowser.submit()
+									parser_eventpage = BeautifulSoup(bet_done.read())
+									advice = parser_eventpage.findAll("div", {"id": "flash"})
+									print "Tasa:", str(min), ", apuesta:", coins_arg, "-", str(advice[0]).split("\">")[1].split("</")[0]
+									mbrowser.follow_link(text_regex="Jugar")
+									# Se disminuye el contador de apuestas
+									bet_num -= 1
 							if errors == 5:
 								i += 1
 						else:
