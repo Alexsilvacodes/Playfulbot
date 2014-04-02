@@ -14,18 +14,19 @@ def main():
 	cyan_ini = "\033[36m"
 	cyan_end = "\033[0m"
 
-	argument_parser = argparse.ArgumentParser(description="Autoapuestas en \
-		Playfulbet")
-	argument_parser.add_argument("-m", "--tasamin", help="Realizar apuestas menores (cantidad de coins establecidas con \
-								[coins_min](200 por defecto)) a tasas inferiores o iguales a 1.2. Esta opción solo se \
-								activa si se apuesta 800 o más coins.", action="store_true")
+	argument_parser = argparse.ArgumentParser(description="Autoapuestas en " +
+	"Playfulbet")
+	argument_parser.add_argument("-m", "--tasamin", help="Realizar apuestas " +
+	"menores (cantidad de coins establecidas con [coins_min](200 por defecto)) " +
+	" a tasas inferiores o iguales a 1.2. Esta opción solo se activa si se " +
+	"apuesta 800 o más coins.", action="store_true")
 	argument_parser.add_argument("user", help="Usuario de Playfulbet")
 	argument_parser.add_argument("password", help="Contraseña de Playfulbet")
-	argument_parser.add_argument("coins", nargs="?", default="200", 
-								help="Numero de monedas a apostar. Por defecto 200", type=int)
-	argument_parser.add_argument("coins_min", nargs="?", 
-								help="Numero de monedas a apostar a las tasas inferiores a 1.2 (incluidas). \
-								Por defecto 200", type=int)
+	argument_parser.add_argument("coins", nargs="?", default="200",
+	help="Numero de monedas a apostar. Por defecto 200", type=int)
+	argument_parser.add_argument("coins_min", nargs="?", default="200",
+	help="Numero de monedas a apostar a las tasas inferiores a 1.2 " +
+	"(incluidas). Por defecto 200", type=int)
 	args = argument_parser.parse_args()
 
 	tasa_min_arg = args.tasamin
@@ -52,34 +53,51 @@ def main():
 		parser_mainpage = BeautifulSoup(mainpage_loggedin.read())
 		promo = parser_mainpage.findAll("a", {"href": "/promociones"})
 		connected = len(promo) > 1
-		
+
 		if connected:
 			try:
 				# Obtener numero de coins
-				coins = promo[0].b.string.split(" ")[0].replace(".", "")
+				coins = parser_mainpage.findAll("b", {"class": "active-coins"})[0].string
+				played_coins = parser_mainpage.findAll("b", {"class": "played"})[0].string
+
+				print
+				print "Tienes:"
+				print green_ini + "- " + coins + " coins disponibles" + green_end
+				print red_ini + "- " + played_coins + " coins jugadas" + red_end
+				print
+				
+				key_response = raw_input("Desea continuar la apuesta [s/n]: ")
+				if key_response.lower() is "s" or key_response is "" or int(coins) < 200:
+					pass
+				else:
+					raise KeyboardInterrupt
+
+				coins = coins.replace(".", "")
 
 				bet_num = 0
-	
+
 				# Numero de apuestas
 				if int(coins_arg > 800) and tasa_min_arg:
 					bet_max = int(coins) // int(coins_arg)
 					bet_min = (int(coins) - bet_max * int(coins_arg)) // int(coins_min_arg)
 					bet_num = bet_max + bet_min
-	
+
 					print
-					print cyan_ini + "Se realizarán", bet_max, "apuestas de " + str(coins_arg) + " coins y", bet_min,
-					"apuestas de " + str(coins_min_arg) + " coins" + cyan_end
+					print cyan_ini + "Se realizarán", bet_max, "apuestas de " + \
+					str(coins_arg) + " coins y", bet_min, "apuestas de " + \
+					str(coins_min_arg) + " coins" + cyan_end
 					print
 				else:
 					bet_num = int(coins) // int(coins_arg)
-	
+
 					print
-					print cyan_ini + "Se realizarán", bet_num, "apuestas de " + str(coins_arg) + " coins" + cyan_end
+					print cyan_ini + "Se realizarán", bet_num, "apuestas de " + coins_arg + \
+					" coins" + cyan_end
 					print
-	
+
 				if bet_num > 0:
 					print "Apuestas:"
-	
+
 				# Bucle de paginas
 				page_num = 1
 				while page_num < 7 and bet_num > 0:
@@ -93,7 +111,8 @@ def main():
 					while i < len(links) and bet_num > 0:
 						link = links[i]
 						# Para que no se repitan obtener solo los eventos que no se han jugado
-						if link.attrs[1][1] == "btn--action" and link_url != link.url and link.text != "Juega otra vez":
+						if link.attrs[1][1] == "btn--action" and link_url != link.url and \
+						link.text != "Juega otra vez":
 							link_url = link.url
 							mbrowser.follow_link(link)
 							parser_eventpage = BeautifulSoup(mbrowser.response().read())
@@ -115,7 +134,7 @@ def main():
 								# Rellenar formulario de apuesta
 								mbrowser.select_form(nr=2)
 								mbrowser.form["option_id"] = [min_option.split("_")[-1]]
-								if int(coins_arg > 800) and min <= 1.2 and tasa_min_arg:
+								if int(coins_arg > 800) and min <= 1.2 and bet_min > 0 and tasa_min_arg:
 									mbrowser.form["points"] = str(coins_min_arg)
 									bet_done = mbrowser.submit()
 									parser_eventpage = BeautifulSoup(bet_done.read())
@@ -123,10 +142,9 @@ def main():
 									print "Tasa:", str(min), "-", str(advice[0]).split("\">")[1].split("</")[0]
 									mbrowser.follow_link(text_regex="Jugar")
 									# Se disminuye el contador de apuestas
+									bet_min -= 1
 									bet_num -= 1
-								elif int(coins_arg > 800) and min > 1.2 and tasa_min_arg:
-									pass
-								else:
+								elif int(coins_arg > 800) and min > 1.2 and bet_max and tasa_min_arg:
 									mbrowser.form["points"] = str(coins_arg)
 									bet_done = mbrowser.submit()
 									parser_eventpage = BeautifulSoup(bet_done.read())
@@ -134,7 +152,10 @@ def main():
 									print "Tasa:", str(min), "-", str(advice[0]).split("\">")[1].split("</")[0]
 									mbrowser.follow_link(text_regex="Jugar")
 									# Se disminuye el contador de apuestas
+									bet_max -= 1
 									bet_num -= 1
+								else:
+									pass
 							if errors == 5:
 								i += 1
 						else:
@@ -151,9 +172,11 @@ def main():
 		else:
 			print red_ini + ">> Datos de login incorrectos" + red_end
 	except mechanize.URLError, e:
-		print ">> Error de conexion"
+		print red_ini + ">> Error de conexion" + red_end
+	except KeyboardInterrupt, e:
+		print red_ini + ">> Apuesta interrumpida por el usuario" + red_end
 
-	
+
 
 if __name__ == '__main__':
 	main()

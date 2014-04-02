@@ -12,7 +12,7 @@ from setuptools import setup#, find_packages
 setup(
 	name="Playfulbot",
 	description="Playfulbet auto-bet",
-	version="1.0.4",
+	version="1.0.6",
 	author="Alex Silva",
 	author_email="h4ll0ck at gmail dot com",
 	url="https://github.com/Alexsays/Playfulbot",
