@@ -10,8 +10,29 @@
     <height>223</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>327</width>
+    <height>223</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>327</width>
+    <height>223</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Playfulbot</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QDialog{background-color: #092b39;}</string>
   </property>
   <widget class="QLabel" name="label">
    <property name="geometry">
@@ -26,7 +47,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>../Playfulbet Bot/logo.png</pixmap>
+    <pixmap>images/logo.png</pixmap>
    </property>
   </widget>
   <widget class="QLineEdit" name="loginEdit">
@@ -35,8 +56,16 @@
      <x>30</x>
      <y>100</y>
      <width>271</width>
-     <height>21</height>
+     <height>31</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>16</pointsize>
+    </font>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
    </property>
    <property name="placeholderText">
     <string>Nombre usuario o email</string>
@@ -48,14 +77,22 @@
      <x>30</x>
      <y>140</y>
      <width>271</width>
-     <height>21</height>
+     <height>31</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>16</pointsize>
+    </font>
    </property>
    <property name="text">
     <string/>
    </property>
    <property name="echoMode">
     <enum>QLineEdit::Password</enum>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
    </property>
    <property name="placeholderText">
     <string>Contraseña</string>
@@ -66,7 +103,7 @@
     <rect>
      <x>190</x>
      <y>180</y>
-     <width>114</width>
+     <width>111</width>
      <height>32</height>
     </rect>
    </property>
