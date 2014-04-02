@@ -7,17 +7,22 @@ Usage:
     python setup.py install
 """
 
-from setuptools import setup
+from setuptools import setup#, find_packages
 
 setup(
 	name="Playfulbot",
 	description="Playfulbet auto-bet",
-	version="1.0.3",
+	version="1.0.4",
 	author="Alex Silva",
 	author_email="h4ll0ck at gmail dot com",
 	url="https://github.com/Alexsays/Playfulbot",
 	license="GNU General Public License (GPLv2)",
-	scripts=['playfulbot.py'],
+	packages = ["command_line", ],
+	entry_points = {
+        'console_scripts': [
+            'playfulbot = command_line.playfulbot:main'
+        ]
+    },
 	install_requires=[
 		"mechanize",
 		"beautifulsoup4"
