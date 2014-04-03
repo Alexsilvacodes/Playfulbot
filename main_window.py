@@ -33,16 +33,11 @@ class Ui_MainWindow(QtCore.QObject):
             "lilac": "#7d5ec7",
             "gold": "#dfb14f"
         }
-        self.photo_label = QtGui.QLabel(self.frame_left)
-        self.photo_label.setGeometry(QtCore.QRect(10, 10, 122, 122))
-        self.photo_label.setObjectName(_fromUtf8("photo_label"))
-        self.photo_label.setStyleSheet(_fromUtf8("QFrame {border: transparent 4px;}"))
         photo_pix = QtGui.QPixmap.fromImage(QtGui.QImage.fromData(self.data['userimage'])).scaled(122, 122)
         if photo_pix.isNull():
             photo_pix.load("images/default.jpg")
         self.photo_label.setPixmap(photo_pix)
-        self.frame_photo = QtGui.QFrame(self.frame_left)
-        self.frame_photo.setGeometry(QtCore.QRect(10, 10, 122, 122))
+
         if int(self.data['level']) < 16:
             level_color = level_colors["blue"]
         elif int(self.data['level']) < 31:
@@ -90,6 +85,9 @@ class Ui_MainWindow(QtCore.QObject):
         MainWindow.setSizePolicy(sizePolicy)
         MainWindow.setMinimumSize(QtCore.QSize(1024, 768))
         MainWindow.setMaximumSize(QtCore.QSize(1024, 768))
+        x = (QtGui.QApplication.desktop().width() - 1024) / 2
+        y = (QtGui.QApplication.desktop().height() - 768) / 2
+        MainWindow.move(x, y)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setStyleSheet(_fromUtf8("QWidget{background-color: white;}"))
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
@@ -103,12 +101,18 @@ class Ui_MainWindow(QtCore.QObject):
         font = QtGui.QFont()
         font.setFamily(_fromUtf8("Helvetica Neue"))
         font.setPointSize(29)
+        self.photo_label = QtGui.QLabel(self.frame_left)
+        self.photo_label.setGeometry(QtCore.QRect(10, 10, 122, 122))
+        self.photo_label.setObjectName(_fromUtf8("photo_label"))
+        self.photo_label.setStyleSheet(_fromUtf8("QFrame {border: transparent 4px;}"))
+        self.frame_photo = QtGui.QFrame(self.frame_left)
+        self.frame_photo.setGeometry(QtCore.QRect(10, 10, 122, 122))
         self.user_label.setFont(font)
         self.user_label.setStyleSheet(_fromUtf8("QLabel { color: white; }"))
         self.user_label.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.user_label.setObjectName(_fromUtf8("user_label"))
         self.label = QtGui.QLabel(self.frame_left)
-        self.label.setGeometry(QtCore.QRect(870, 30, 61, 31))
+        self.label.setGeometry(QtCore.QRect(870, 30, 65, 31))
         font = QtGui.QFont()
         font.setPointSize(25)
         self.label.setFont(font)
@@ -130,7 +134,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.coins_p_label.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.coins_p_label.setObjectName(_fromUtf8("coins_p_label"))
         self.coins_label = QtGui.QLabel(self.frame_left)
-        self.coins_label.setGeometry(QtCore.QRect(660, 30, 210, 31))
+        self.coins_label.setGeometry(QtCore.QRect(660, 30, 201, 31))
         font = QtGui.QFont()
         font.setPointSize(25)
         self.coins_label.setFont(font)

@@ -4,7 +4,7 @@
 
 from PyQt4 import QtCore, QtGui
 from main_window import *
-import playfulbot_core
+import playfulbot_core, locale
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
