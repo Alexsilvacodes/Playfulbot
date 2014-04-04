@@ -8,12 +8,12 @@ from bs4 import BeautifulSoup
 from colorama import Fore
 
 def main():
-	red_ini = "Fore.RED"
-	red_end = "Fore.RESET"
-	green_ini = "Fore.GREEN"
-	green_end = "Fore.RESET"
-	cyan_ini = "Fore.CYAN"
-	cyan_end = "Fore.RESET"
+	red_ini = Fore.RED
+	red_end = Fore.RESET
+	green_ini = Fore.GREEN
+	green_end = Fore.RESET
+	cyan_ini = Fore.CYAN
+	cyan_end = Fore.RESET
 
 	argument_parser = argparse.ArgumentParser(description="Autoapuestas en " +
 	"Playfulbet")
@@ -45,6 +45,10 @@ def main():
 
 	try:
 		mbrowser = mechanize.Browser()
+		mbrowser.set_handle_robots(False)
+		mbrowser.set_handle_equiv(False)
+		mbrowser.addheaders = [('User-agent', 'Mozilla/5.0 (X11; U; \
+		Linux i686; es-ES; rv:1.9.0.1) Gecko/2008071615 Fedora/3.0.1-1.fc9 Firefox/3.0.1')]
 		mbrowser.open("http://playfulbet.com/")
 		mbrowser.select_form(nr=0)
 		for key in form_data:
@@ -108,13 +112,16 @@ def main():
 				if bet_num > 0:
 					print "Apuestas:"
 
+				if bet_num > 0:
+					mbrowser.follow_link(url_regex="/eventos")
+
 				# Bucle de paginas
 				page_num = 1
-				while page_num < 7 and bet_num > 0:
+				while page_num < 11 and bet_num > 0:
 					# Bucle de eventos
 					link_url = ""
 					links = []
-					mbrowser.follow_link(url_regex="/eventos")
+					
 					for link in mbrowser.links(text_regex="Juega"):
 						links.append(link)
 
