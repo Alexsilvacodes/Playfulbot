@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# 2014 Alex Silva <alexsilvaf28 at gmail.com>
+# 2015 Alex Silva <alexsilvaf28 at gmail.com>
 
 import httplib, urllib, urllib2, mechanize, argparse
 from bs4 import BeautifulSoup
