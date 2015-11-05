@@ -47,7 +47,7 @@ class Ui_Dialog(object):
         Dialog.setMinimumSize(QtCore.QSize(327, 250))
         Dialog.setMaximumSize(QtCore.QSize(327, 250))
         Dialog.setStyleSheet(_fromUtf8("QDialog{background-color: #092b39; color: white;}"))
-        flags = QtCore.Qt.CustomizeWindowHint 
+        flags = QtCore.Qt.CustomizeWindowHint
         Dialog.setWindowFlags(flags)
         self.label = QtGui.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(70, 20, 191, 61))
@@ -78,6 +78,8 @@ class Ui_Dialog(object):
         self.loginEdit.setFont(font)
         self.loginEdit.setAlignment(QtCore.Qt.AlignCenter)
         self.loginEdit.setObjectName(_fromUtf8("loginEdit"))
+        self.loginEdit.selectAll()
+        self.loginEdit.setFocus()
         self.passEdit = QtGui.QLineEdit(Dialog)
         self.passEdit.setGeometry(QtCore.QRect(30, 160, 271, 31))
         font = QtGui.QFont()

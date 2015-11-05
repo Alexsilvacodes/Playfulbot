@@ -30,24 +30,29 @@ class PlayfulbotCore(QtCore.QObject):
 
 		try:
 			self.mbrowser = mechanize.Browser()
-			self.mbrowser.open("http://playfulbet.com/")
+			self.mbrowser.set_handle_robots(False)
+			self.mbrowser.set_handle_equiv(False)
+			self.mbrowser.addheaders = [('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.155 Safari/537.36')]
+			self.mbrowser.open("http://playfulbet.com/users/sign_in")
 			self.mbrowser.select_form(nr=0)
 			for key in form_data:
 				self.mbrowser.form[key] = form_data[key]
 			self.mainpage_loggedin = self.mbrowser.submit()
 
 			self.parser_mainpage = BeautifulSoup(self.mainpage_loggedin.read())
-			promo = self.parser_mainpage.findAll("a", {"href": "/promociones"})
+			promo = self.parser_mainpage.findAll("a", {"href": "http://playfulbet.com/promociones"})
 			self.connected = len(promo) > 1
 			self.signalLogin.emit(self.connected)
 		except mechanize.URLError, e:
+			print e
 			self.signalLogin.emit(False)
 
 	def userData(self):
 		try:
 			self.parser_profile = BeautifulSoup(self.mbrowser.follow_link(url_regex="/usuarios"))
 			user_data = {}
-			image_profile_url = self.parser_profile.findAll("img", {"class": "avatar__img--super-big"})[0]["src"]
+			print "aqui1"
+			image_profile_url = self.parser_profile.findAll("img", {"class": "avatar_img"})[0]["src"]
 			if "http" not in image_profile_url:
 				image_profile_url = "http://playfulbet.com" + image_profile_url
 			image_data = QtCore.QByteArray.fromRawData(urllib.urlopen(image_profile_url).read())
@@ -55,9 +60,9 @@ class PlayfulbotCore(QtCore.QObject):
 			user_data['username'] = self.parser_profile.findAll("a", {"class": "user-list__title"})[0].string
 			user_data['activecoins'] = self.parser_profile.findAll("b", {"class": "active-coins"})[0].string
 			user_data['playedcoins'] = self.parser_profile.findAll("b", {"class": "played"})[0].string
-			user_data['level'] = self.parser_profile.findAll("span", {"class": "info-number"})[0].string
-			user_data['levelbar'] = self.parser_profile.findAll("div", {"class": "info-bar__actual"})[1]["style"].split(" ")[1].replace("%", "")
-			user_data['playedtotal'] = self.parser_profile.findAll("b", {"class": "user-stats__number"})[0].string
+			user_data['level'] = self.parser_profile.findAll("span", {"class": "avatar_sat"})[0].string
+			user_data['levelbar'] = self.parser_profile.findAll("div", {"class": "bar-inside"})[0]["style"].split(" ")[1].replace("%", "")
+			# user_data['playedtotal'] = self.parser_profile.findAll("b", {"class": "user-stats__number"})[0].string
 
 			self.signalUserData.emit(user_data)
 		except mechanize.URLError, e:
