@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# 2014 Alex Silva <alexsilvaf28 at gmail.com>
+# 2015 Alex Silva <alexsilvaf28 at gmail.com>
 
 from PyQt4 import QtCore, QtGui
 from main_window import *
