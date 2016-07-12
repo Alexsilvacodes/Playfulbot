@@ -12,11 +12,11 @@ from setuptools import setup#, find_packages
 setup(
 	name="Playfulbot",
 	description="Playfulbet auto-bet",
-	version="1.1.2",
+	version="1.2",
 	author="Alex Silva",
 	author_email="h4ll0ck at gmail dot com",
 	url="https://github.com/Alexsays/Playfulbot",
-	license="GNU General Public License (GPLv2)",
+	license="GNU General Public License (GPLv3)",
 	packages = ["command_line", ],
 	entry_points = {
         'console_scripts': [
