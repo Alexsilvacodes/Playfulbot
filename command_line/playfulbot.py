@@ -47,16 +47,16 @@ def main():
 		mbrowser = mechanize.Browser()
 		mbrowser.set_handle_robots(False)
 		mbrowser.set_handle_equiv(False)
-		mbrowser.addheaders = [('User-agent', 'Mozilla/5.0 (X11; U; \
-		Linux i686; es-ES; rv:1.9.0.1) Gecko/2008071615 Fedora/3.0.1-1.fc9 Firefox/3.0.1')]
-		mbrowser.open("http://playfulbet.com/")
+		mbrowser.addheaders = [('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) \
+		 AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.155 Safari/537.36')]
+		mbrowser.open("http://playfulbet.com/users/sign_in")
 		mbrowser.select_form(nr=0)
 		for key in form_data:
 			mbrowser.form[key] = form_data[key]
 		mainpage_loggedin = mbrowser.submit()
 		
-		parser_mainpage = BeautifulSoup(mbrowser.follow_link(url_regex="/usuarios"))
-		promo = parser_mainpage.findAll("a", {"href": "/promociones"})
+		parser_mainpage = BeautifulSoup(mainpage_loggedin.read())
+		promo = parser_mainpage.findAll("a", {"href": "http://playfulbet.com/promociones"})
 		connected = len(promo) > 1
 
 		if connected:
@@ -118,6 +118,7 @@ def main():
 				# Bucle de paginas
 				page_num = 1
 				while page_num < 11 and bet_num > 0:
+					print("hola")
 					# Bucle de eventos
 					link_url = ""
 					links = []
