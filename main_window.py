@@ -75,6 +75,10 @@ class Ui_MainWindow(QtCore.QObject):
         self.level_progress.setValue(float(self.data['levelbar']))
         self.played_label.setText(self.data['playedtotal'] + " jugadas")
 
+        self.tab_widget.setTabText(self.tab_widget.indexOf(self.pend_tab), _translate("MainWindow", "0" + " Pendientes", None))
+        self.tab_widget.setTabText(self.tab_widget.indexOf(self.win_tab), _translate("MainWindow", self.data['wins'] + " Ganadas", None))
+        self.tab_widget.setTabText(self.tab_widget.indexOf(self.lost_tab), _translate("MainWindow", self.data['lost'] +" Perdidas", None))
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
         MainWindow.resize(1024, 768)

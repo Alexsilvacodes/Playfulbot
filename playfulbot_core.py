@@ -39,7 +39,7 @@ class PlayfulbotCore(QtCore.QObject):
 				self.mbrowser.form[key] = form_data[key]
 			self.mainpage_loggedin = self.mbrowser.submit()
 
-			self.parser_mainpage = BeautifulSoup(self.mainpage_loggedin.read())
+			self.parser_mainpage = BeautifulSoup(self.mainpage_loggedin.read(), "html.parser")
 			promo = self.parser_mainpage.findAll("a", {"href": "http://playfulbet.com/promociones"})
 			self.connected = len(promo) > 1
 			self.signalLogin.emit(self.connected)
@@ -49,20 +49,30 @@ class PlayfulbotCore(QtCore.QObject):
 
 	def userData(self):
 		try:
-			self.parser_profile = BeautifulSoup(self.mbrowser.follow_link(url_regex="/usuarios"))
+			self.parser_profile = BeautifulSoup(self.mbrowser.follow_link(url_regex="/usuarios"), "html.parser")
 			user_data = {}
-			print "aqui1"
+
 			image_profile_url = self.parser_profile.findAll("img", {"class": "avatar_img"})[0]["src"]
 			if "http" not in image_profile_url:
 				image_profile_url = "http://playfulbet.com" + image_profile_url
-			image_data = QtCore.QByteArray.fromRawData(urllib.urlopen(image_profile_url).read())
+			# Browser to download image
+			img_browser = mechanize.Browser()
+			img_browser.set_handle_robots(False)
+			img_browser.set_handle_equiv(False)
+			img_browser.addheaders = [('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.155 Safari/537.36')]
+			img_response = img_browser.open(image_profile_url)
+
+			image_data = QtCore.QByteArray.fromRawData(img_response.read())
 			user_data['userimage'] = image_data
 			user_data['username'] = self.parser_profile.findAll("a", {"class": "user-list__title"})[0].string
 			user_data['activecoins'] = self.parser_profile.findAll("b", {"class": "active-coins"})[0].string
 			user_data['playedcoins'] = self.parser_profile.findAll("b", {"class": "played"})[0].string
 			user_data['level'] = self.parser_profile.findAll("span", {"class": "avatar_sat"})[0].string
-			user_data['levelbar'] = self.parser_profile.findAll("div", {"class": "bar-inside"})[0]["style"].split(" ")[1].replace("%", "")
-			# user_data['playedtotal'] = self.parser_profile.findAll("b", {"class": "user-stats__number"})[0].string
+			user_data['levelbar'] = self.parser_profile.findAll("div", {"class": "donut-level-chart"})[0]["data-percentage"].replace("%", "")
+			user_data['playedtotal'] = self.parser_profile.findAll("div", {"id": "bchart-info-all"})[0].contents[0].string
+			bets_header = self.parser_profile.findAll("h6", text='Apuestas')[0].parent.findAll("div")[0].contents[1].contents[0].contents
+			user_data['wins'] = bets_header[1].contents[0].string
+			user_data['lost'] = bets_header[2].contents[0].string
 
 			self.signalUserData.emit(user_data)
 		except mechanize.URLError, e:
