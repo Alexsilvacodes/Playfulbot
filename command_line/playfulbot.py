@@ -55,7 +55,7 @@ def main():
 			mbrowser.form[key] = form_data[key]
 		mainpage_loggedin = mbrowser.submit()
 		
-		parser_mainpage = BeautifulSoup(mainpage_loggedin.read())
+		parser_mainpage = BeautifulSoup(mainpage_loggedin.read(), "html5lib")
 		promo = parser_mainpage.findAll("a", {"href": "http://playfulbet.com/promociones"})
 		connected = len(promo) > 1
 
